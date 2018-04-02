@@ -303,8 +303,11 @@ CConvert2Lua::OutputString(FILE *fp, const char *str, field_meta_t& meta) {
 		fprintf(fp, "%s\t%s = {%s=%c%s%c", lineSeparator, str, meta.name, stringSeparator, str, stringSeparator);
 	}
 	else {
-		fprintf(fp, "%s", fieldSeparator);
-		fprintf(fp, "%s=%c%s%c", meta.name, stringSeparator, str, stringSeparator);
+		// skip empty string
+		if (strlen(str) > 0) {
+			fprintf(fp, "%s", fieldSeparator);
+			fprintf(fp, "%s=%c%s%c", meta.name, stringSeparator, str, stringSeparator);
+		}
 	}
 
 	if (meta.isToColumn) {
