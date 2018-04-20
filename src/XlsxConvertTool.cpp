@@ -116,6 +116,8 @@ CXlsxConvertTool::SetupMetaTable() {
 
 	fp = fopen(path, "r");
 	if (nullptr == fp) {
+		fprintf(stderr, "file <%s> open failed!!!\n", path);
+
 		FILE *ferr = fopen("xlsxconverttool.error", "at+");
 		fprintf(ferr, "file <%s> open failed!!!\n", path);
 		fclose(ferr);
@@ -124,12 +126,16 @@ CXlsxConvertTool::SetupMetaTable() {
 	else {
 		file_size = fread(filebuf, 1, FILE_BUF_SIZE, fp);
 		if (0 == file_size) {
+			fprintf(stderr, "file <%s> is empty!!!\n", path);
+
 			FILE *ferr = fopen("xlsxconverttool.error", "at+");
 			fprintf(ferr, "file <%s> is empty!!!\n", path);
 			fclose(ferr);
 			exit(-1);
 		}
 		else if (file_size == FILE_BUF_SIZE) {
+			fprintf(stderr, "file <%s> is empty!!!\n", path);
+
 			FILE *ferr = fopen("xlsxconverttool.error", "at+");
 			fprintf(ferr, "file <%s> is too big -- (%d/%d)bytes!!!\n", path, file_size, FILE_BUF_SIZE - 1);
 			fclose(ferr);
@@ -146,6 +152,9 @@ CXlsxConvertTool::SetupMetaTable() {
 				if (name == "Sql") {
 					for (pugi::xml_node_iterator it2 = it->begin(); it2 != it->end(); ++it2) {
 						std::string strInput = it2->attribute("InputName").value();
+						if (strInput.length() <= 0)
+							continue;
+
 						int nSheetIdx = atoi(it2->attribute("SheetIdx").value());
 						int nTitleRowId = atoi(it2->attribute("TitleRowId").value());
 						std::string strFields = it2->attribute("Fields").value();
@@ -250,6 +259,8 @@ CXlsxConvertTool::SetupMetaTable() {
 							fclose(fp_to_truncate);
 						}
 						else {
+							fprintf(stderr, "output file <%s> truncate failed!!!\n", item.outputName);
+
 							FILE *ferr = fopen("xlsxconverttool.error", "at+");
 							fprintf(ferr, "output file <%s> truncate failed!!!\n", item.outputName);
 							fclose(ferr);
@@ -260,6 +271,9 @@ CXlsxConvertTool::SetupMetaTable() {
 				else if (name == "Lua") {
 					for (pugi::xml_node_iterator it2 = it->begin(); it2 != it->end(); ++it2) {
 						std::string strInput = it2->attribute("InputName").value();
+						if (strInput.length() <= 0)
+							continue;
+
 						int nSheetIdx = atoi(it2->attribute("SheetIdx").value());
 						int nTitleRowId = atoi(it2->attribute("TitleRowId").value());
 						std::string strFields = it2->attribute("Fields").value();
@@ -360,6 +374,8 @@ CXlsxConvertTool::SetupMetaTable() {
 							fclose(fp_to_truncate);
 						}
 						else {
+							fprintf(stderr, "output file <%s> truncate failed!!!\n", item.outputName);
+
 							FILE *ferr = fopen("xlsxconverttool.error", "at+");
 							fprintf(ferr, "output file <%s> truncate failed!!!\n", item.outputName);
 							fclose(ferr);
@@ -381,8 +397,7 @@ CXlsxConvertTool::SetupMetaTable() {
 
 void
 CXlsxConvertTool::Usage(char *progName) {
-	fprintf(stderr, "usage: %s <Excel xls file> [Output filename]\n", progName);
-	fprintf(stderr, "\n");
+	fprintf(stderr, "\nusage: %s <Excel xls file> [Output filename]\n", progName);
 	exit(EXIT_FAILURE);
 }
 

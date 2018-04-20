@@ -61,7 +61,7 @@ CConvert2Sql::Convert(config_item_t *item) {
 
 	book = xlCreateXMLBook();
 	if (!book) {
-		fprintf(stderr, "libxl lib crashed");
+		fprintf(stderr, "libxl lib crashed!!!\n");
 		return -1;
 	}
 
@@ -73,8 +73,7 @@ CConvert2Sql::Convert(config_item_t *item) {
 #endif
 	errMsg = book->errorMessage();
 	if (!bLoad || 0 != strcmp("ok", errMsg)) {
-		fprintf(stderr, "file(%s) load failed, because %s", inputFileName, errMsg);
-		fprintf(stderr, "\n");
+		fprintf(stderr, "file(%s) load failed, because %s!!!\n", inputFileName, errMsg);
 		return -2;
 	}
 
@@ -83,8 +82,7 @@ CConvert2Sql::Convert(config_item_t *item) {
 	sheetType = book->sheetType(sheetIdx);
 	if (sheetCount <= 0
 		|| libxl::SHEETTYPE_SHEET != sheetType) {
-		fprintf(stderr, "can't find sheet or sheet type error -- sheetIdx(%d), sheetCount(%d), sheetType(%d)", sheetIdx, sheetCount, sheetType);
-		fprintf(stderr, "\n");
+		fprintf(stderr, "can't find sheet or sheet type error -- sheetIdx(%d), sheetCount(%d), sheetType(%d)!!!\n", sheetIdx, sheetCount, sheetType);
 		return -3;
 	}
 	// open and parse the sheet
@@ -100,8 +98,7 @@ CConvert2Sql::Convert(config_item_t *item) {
 	//
 	fp = fopen(outputFileName, "ab+");
 	if (fp == NULL) {
-		fprintf(stderr, "create file failed : %s.", outputFileName);
-		fprintf(stderr, "\n");
+		fprintf(stderr, "create file failed : %s!!!\n", outputFileName);
 		return -4;
 	}
 

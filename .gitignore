@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+msvc/\.vs/xlsxconverttool/v15/
+
+*.idb
+
+*.pdb
+
+msvc/Win32/xlsxconverttool\.dir/Debug/
+
+msvc/Win32/xlsxconverttool\.dir/Release/
