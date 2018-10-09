@@ -279,6 +279,7 @@ CXlsxConvertTool::SetupMetaTable() {
 						std::string strFields = it2->attribute("Fields").value();
 						std::string strKeys = "";
 						std::string strOutput = it2->attribute("OutputName").value();
+						std::string strSqlTable = it2->attribute("SqlTableName").value();
 						std::string strLuaTable = it2->attribute("LuaTableName").value();
 
 						config_item_t item;
@@ -304,6 +305,7 @@ CXlsxConvertTool::SetupMetaTable() {
 						sprintf(item.inputFields, "%s", strFields.c_str());
 						sprintf(item.inputKeys, "%s", strKeys.c_str());
 						sprintf(item.outputName, "%s", strOutput.c_str());
+						sprintf(item.sqlTableName, "%s", strSqlTable.c_str());
 						sprintf(item.luaTableName, "%s", strLuaTable.c_str());
 
 						// fields format: "A, C-Z,..."
@@ -480,5 +482,7 @@ _tmain(int argc, TCHAR *argv[]) {
 			++it;
 		}
 	}
+	fprintf(stderr, "\n================================ convert over. ================================\n");
+	system("pause");
 	return EXIT_SUCCESS;
 }

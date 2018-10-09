@@ -18,8 +18,8 @@ public:
 
 public:
 	static void OutputCell(FILE *fp, void *sheet, int row, int col, field_meta_t& meta, const char *inputFileName, int lastRow, int lastCol);
-	static void OutputString(FILE *fp, const char *str, field_meta_t& meta);
-	static void OutputNumber(FILE *fp, const double number, field_meta_t& meta);
+	static void OutputString(FILE *fp, const char *str, field_meta_t& meta, const char *inputFileName);
+	static void OutputNumber(FILE *fp, const double number, field_meta_t& meta, const char *inputFileName);
 
 public:
 	CXlsxConvertTool *_app;

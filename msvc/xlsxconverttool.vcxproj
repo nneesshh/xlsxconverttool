@@ -28,7 +28,7 @@
     <ProjectGuid>{D7006BEF-EC83-4D63-8B50-6E87C5A589C5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>xls2csv</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

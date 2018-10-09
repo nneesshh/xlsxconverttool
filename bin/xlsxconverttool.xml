@@ -6,5 +6,6 @@
 	</Sql>
 	<Lua>
 		<Item InputName="config_robot.xlsx" SheetIdx="0" TitleRowId="2" Fields="A-D" OutputName="config_robot.lua" LuaTableName="ConfigRobot" />
+		<Item InputName="config_robot.xlsx" SheetIdx="0" TitleRowId="2" Fields="A-D" OutputName="config_robot.lua" LuaTableName="ConfigRobot" />
 	</Lua>
 </Root>

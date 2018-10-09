@@ -10,6 +10,8 @@
 #include <unistd.h>
 #endif
 
+#include <string>
+#include <unordered_map>
 #include <iostream>
 #include <conio.h>
 
@@ -20,6 +22,17 @@ static char *fieldSeparator = ",";
 static char *lineSeparator = "\n";
 static char *lineCompleteSeparator = ",";
 static char *sentenceCompleteSeparator = "";
+
+static std::unordered_map<std::string, bool> s_mapKeyExistence;
+
+static bool check_key_exists(const std::string& sKey) {
+	std::unordered_map<std::string, bool>::iterator iter = s_mapKeyExistence.find(sKey);
+	if (iter == s_mapKeyExistence.end()) {
+		s_mapKeyExistence[sKey] = true;
+		return false;
+	}
+	return true;
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *
@@ -95,6 +108,11 @@ CConvert2Lua::Convert(config_item_t *item) {
 		sprintf(sheetName, sheet->name())£»
 #endif
 
+	// table name
+	if (strlen(item->luaTableName) < 1) {
+		sprintf(item->luaTableName, "%s", sheetName);
+	}
+
 	//
 	fp = fopen(outputFileName, "ab+");
 	if (fp == NULL) {
@@ -155,19 +173,26 @@ CConvert2Lua::Convert(config_item_t *item) {
 		// separate line
 		fprintf(fp, "%s", lineSeparator);
 
-		// start line
-		if (strlen(item->luaTableName) > 1) {
-			fprintf(fp, "%s = {", item->luaTableName);
-		}
-		else {
-			fprintf(fp, "%s = {", sheetName);
-		}
-		fprintf(fp, "\n}%s%s", sentenceCompleteSeparator, lineSeparator);
+		// start line -- table_name = {
+		fprintf(fp, "--[[%s,%s]]\nlocal __tmp_tbl__ = {"
+			, inputFileName
+			, item->luaTableName);
+
+		// close block
+		fprintf(fp, "\n}%s;%s=%s or {};for k,v in pairs(__tmp_tbl__) do %s[k]=v end;%s"
+			, sentenceCompleteSeparator
+			, item->luaTableName
+			, item->luaTableName
+			, item->luaTableName
+			, lineSeparator);
 
 		//
 		fclose(fp);
 	}
 	else if (sheetLastRow >= item->inputTitleRowId + 1) {
+		//
+		s_mapKeyExistence.clear();
+
 		// at least exist one data row
 		// process all rows of the sheet
 		for (cellRow = 0; cellRow < sheetLastRow; ++cellRow) {
@@ -214,13 +239,10 @@ CConvert2Lua::Convert(config_item_t *item) {
 						// separate line
 						fprintf(fp, "%s", lineSeparator);
 
-						// start line
-						if (strlen(item->luaTableName) > 1) {
-							fprintf(fp, "%s = {", item->luaTableName);
-						}
-						else {
-							fprintf(fp, "%s = {", sheetName);
-						}
+						// start line -- table_name = {
+						fprintf(fp, "--[[%s,%s]]\nlocal __tmp_tbl__ = {"
+							, inputFileName
+							, item->luaTableName);
 					}
 				}
 				else {
@@ -230,8 +252,13 @@ CConvert2Lua::Convert(config_item_t *item) {
 			}
 		}
 
-		//
-		fprintf(fp, "\n}%s%s", sentenceCompleteSeparator, lineSeparator);
+		// close block
+		fprintf(fp, "\n}%s;if not %s then %s =__tmp_tbl__;else for k,v in pairs(__tmp_tbl__) do %s[k]=v end;end;%s"
+			, sentenceCompleteSeparator
+			, item->luaTableName
+			, item->luaTableName
+			, item->luaTableName
+			, lineSeparator);
 
 		//
 		fclose(fp);
@@ -256,7 +283,7 @@ CConvert2Lua::OutputCell(FILE *fp, void *sheet, int row, int col, field_meta_t& 
 		|| libxl::CELLTYPE_ERROR == eCellType
 		|| libxl::SHEETSTATE_VISIBLE != sheet_->hidden()) {
 		// output empty string
-		OutputString(fp, "", meta);
+		OutputString(fp, "", meta, inputFileName);
 
 		//
 		if (meta.isToColumn && row + 1 < lastRow)
@@ -264,7 +291,7 @@ CConvert2Lua::OutputCell(FILE *fp, void *sheet, int row, int col, field_meta_t& 
 	}
 	else if (libxl::CELLTYPE_NUMBER == eCellType) {
 		double number = sheet_->readNum(row, col);
-		OutputNumber(fp, number, meta);
+		OutputNumber(fp, number, meta, inputFileName);
 
 		//
 		if (meta.isToColumn && row + 1 < lastRow)
@@ -278,7 +305,7 @@ CConvert2Lua::OutputCell(FILE *fp, void *sheet, int row, int col, field_meta_t& 
 #else
 		const TCHAR *str = sheet_->readStr(cellRow, cellCol);
 #endif
-		OutputString(fp, str, meta);
+		OutputString(fp, str, meta, inputFileName);
 
 		//
 		if (meta.isToColumn && row + 1 < lastRow)
@@ -286,25 +313,31 @@ CConvert2Lua::OutputCell(FILE *fp, void *sheet, int row, int col, field_meta_t& 
 	}
 	else if (libxl::CELLTYPE_BOOLEAN == eCellType) {
 		bool b = sheet_->readBool(row, col);
-		//OutputString(fp, b ? "true" : "false", meta);
+		//OutputString(fp, b ? "true" : "false", meta, inputFileName);
 	}
 	else {
-		//OutputString(fp, "", meta);
+		//OutputString(fp, "", meta, inputFileName);
 	}
 }
 
 // Output a string
 void
-CConvert2Lua::OutputString(FILE *fp, const char *str, field_meta_t& meta) {
+CConvert2Lua::OutputString(FILE *fp, const char *str, field_meta_t& meta, const char *inputFileName) {
 	if (meta.isFromColumn) {
+		// check key exists
+		bool bExist = check_key_exists(str);
+		if (bExist) {
+			fprintf(stderr, "[Convert2Lua] WARNING: key(\"%s\")val(\"%s\") is duplicated -- file(%s)!!!\n",
+				meta.name, str, inputFileName);
+		}
 		fprintf(fp, "%s\t%s = {%s=%c%s%c", lineSeparator, str, meta.name, stringSeparator, str, stringSeparator);
 	}
 	else {
 		// skip empty string
-		if (strlen(str) > 0) {
+//		if (strlen(str) > 0) {
 			fprintf(fp, "%s", fieldSeparator);
 			fprintf(fp, "%s=%c%s%c", meta.name, stringSeparator, str, stringSeparator);
-		}
+//		}
 	}
 
 	if (meta.isToColumn) {
@@ -314,8 +347,15 @@ CConvert2Lua::OutputString(FILE *fp, const char *str, field_meta_t& meta) {
 
 // Output a number
 void
-CConvert2Lua::OutputNumber(FILE *fp, const double number, field_meta_t& meta) {
+CConvert2Lua::OutputNumber(FILE *fp, const double number, field_meta_t& meta, const char *inputFileName) {
 	if (meta.isFromColumn) {
+		// check key exists
+		std::string sStr = std::to_string(number);
+		bool bExist = check_key_exists(sStr);
+		if (bExist) {
+			fprintf(stderr, "[Convert2Lua] WARNING: key(\"%s\")val(\"%.15g\") is duplicated -- file(%s)!!!\n",
+				meta.name, number, inputFileName);
+		}
 		fprintf(fp, "%s\t[%.15g] = {%s=%.15g", lineSeparator, number, meta.name, number);
 	}
 	else {

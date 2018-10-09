@@ -40,3 +40,9 @@ msvc/\.vs/xlsxconverttool/v15/
 msvc/Win32/xlsxconverttool\.dir/Debug/
 
 msvc/Win32/xlsxconverttool\.dir/Release/
+
+*.iobj
+
+*.ipdb
+
+*.ilk

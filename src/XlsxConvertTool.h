@@ -47,6 +47,7 @@ typedef struct config_item_s {
 	char deleteClause[256];
 
 	char outputName[256];
+	char sqlTableName[256];
 	char luaTableName[256];
 
 	meta_table_t metaTable;

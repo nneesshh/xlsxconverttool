@@ -90,10 +90,15 @@ CConvert2Sql::Convert(config_item_t *item) {
 
 	// sheet name
 #ifdef _UNICODE
-		CXlsxConvertTool::W2c(sheet->name(), sheetName, 256);
+	CXlsxConvertTool::W2c(sheet->name(), sheetName, 256);
 #else
-		sprintf(sheetName, sheet->name())£»
+	sprintf(sheetName, sheet->name())£»
 #endif
+	
+	// table name
+	if (strlen(item->sqlTableName) < 1) {
+		sprintf(item->sqlTableName, "%s", sheetName);
+	}
 
 	//
 	fp = fopen(outputFileName, "ab+");
@@ -156,9 +161,13 @@ CConvert2Sql::Convert(config_item_t *item) {
 			// separate line
 			fprintf(fp, "%s", lineSeparator);
 
-			// start line
-			fprintf(fp, "DELETE FROM `%s` WHERE %s;", sheetName, item->deleteClause);
+			// start line -- DELETE FROM xxxx
+			fprintf(fp, "DELETE FROM `%s` WHERE %s;"
+				, item->sqlTableName
+				, item->deleteClause);
 		}
+
+		// close block
 		fprintf(fp, "%s", lineSeparator);
 
 		//
@@ -212,15 +221,17 @@ CConvert2Sql::Convert(config_item_t *item) {
 							// separate line
 							fprintf(fp, "%s", lineSeparator);
 
-							// start line
-							fprintf(fp, "DELETE FROM `%s` WHERE %s;", sheetName, item->deleteClause);
+							// start line -- DELETE FROM xxxx
+							fprintf(fp, "DELETE FROM `%s` WHERE %s;"
+								, item->sqlTableName
+								, item->deleteClause);
 						}
 
 						// separate line
 						fprintf(fp, "%s", lineSeparator);
 
-						// start line
-						fprintf(fp, "INSERT INTO `%s` (", sheetName);
+						// start line -- INSERT INTO xxx
+						fprintf(fp, "INSERT INTO `%s` (", item->sqlTableName);
 						{
 							bool bFirst = true;
 							int i;
@@ -273,7 +284,7 @@ CConvert2Sql::Convert(config_item_t *item) {
 			}
 		}
 
-		//
+		// close block
 		fprintf(fp, "%s%s", sentenceCompleteSeparator, lineSeparator);
 
 		//
