@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <conio.h>
+#include <assert.h>
 
 #include "libxl.h"
 
@@ -92,7 +93,7 @@ CConvert2Sql::Convert(config_item_t *item) {
 #ifdef _UNICODE
 	CXlsxConvertTool::W2c(sheet->name(), sheetName, 256);
 #else
-	sprintf(sheetName, sheet->name())£»
+	sprintf(sheetName, sheet->name());
 #endif
 	
 	// table name
@@ -237,17 +238,18 @@ CConvert2Sql::Convert(config_item_t *item) {
 							int i;
 							for (i = sheetFirstCol; i < sheetLastCol; ++i) {
 								field_meta_t& tmp = meta_table.arr[i];
+
+								assert(strlen(tmp.name) > 1);
+
 								if (tmp.isField) {
+									// field name
 									if (bFirst) {
 										fprintf(fp, "`%s`", tmp.name);
 										bFirst = false;
 									}
 									else {
-										// separate line
-										fprintf(fp, "%s ", fieldSeparator);
-
-										// field name
-										fprintf(fp, "`%s`", tmp.name);
+										// separate field
+										fprintf(fp, "%s `%s`", fieldSeparator, tmp.name);
 									}
 								}
 
@@ -334,7 +336,7 @@ CConvert2Sql::OutputCell(FILE *fp, void *sheet, int row, int col, field_meta_t& 
 		char buff[1024 * 16] = { 0 };
 		char *str = CXlsxConvertTool::W2c(tstr, buff, sizeof(buff));
 #else
-		const TCHAR *str = sheet_->readStr(cellRow, cellCol);
+		const TCHAR *str = sheet_->readStr(row, col);
 #endif
 		OutputString(fp, str, meta);
 
@@ -358,8 +360,7 @@ CConvert2Sql::OutputString(FILE *fp, const char *str, field_meta_t& meta) {
 		fprintf(fp, "(%c%s%c", stringSeparator, str, stringSeparator);
 	}
 	else {
-		fprintf(fp, "%s", fieldSeparator);
-		fprintf(fp, "%c%s%c", stringSeparator, str, stringSeparator);
+		fprintf(fp, "%s%c%s%c", fieldSeparator, stringSeparator, str, stringSeparator);
 	}
 
 	if (meta.isToColumn) {
@@ -374,8 +375,7 @@ CConvert2Sql::OutputNumber(FILE *fp, const double number, field_meta_t& meta) {
 		fprintf(fp, "%s(%.15g", lineSeparator, number);
 	}
 	else {
-		fprintf(fp, "%s", fieldSeparator);
-		fprintf(fp, "%.15g", number);
+		fprintf(fp, "%s%.15g", fieldSeparator, number);
 	}
 
 	if (meta.isToColumn) {

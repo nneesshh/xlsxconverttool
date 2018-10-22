@@ -247,7 +247,7 @@ CXlsxConvertTool::SetupMetaTable() {
 						}
 
 						//
-						_config.push_back(item);
+						_config._vCfgItem.push_back(item);
 
 						// truncate output file 
 						FILE *fp_to_truncate = nullptr;
@@ -368,7 +368,7 @@ CXlsxConvertTool::SetupMetaTable() {
 						}
 
 						//
-						_config.push_back(item);
+						_config._vCfgItem.push_back(item);
 
 						// truncate output file 
 						if (strlen(item.outputName) > 1) {
@@ -419,10 +419,10 @@ CXlsxConvertTool::W2c(const wchar_t *wstr, char *cstr, int clenMax) {
 			);
 
 		// make sure the buffer is big enough for this, making it larger if necessary
-		if (nbytes > clenMax)
-			nbytes = clenMax;
+		nbytes = (nbytes > clenMax - 1) ? (clenMax - 1) : nbytes;
 
 		WideCharToMultiByte(CP_UTF8, 0, wstr, wlen, cstr, nbytes, NULL, NULL);
+		cstr[nbytes] = '\0';
 		return cstr;
 	}
 	return NULL;
@@ -433,11 +433,10 @@ CXlsxConvertTool::C2w(const char *cstr, wchar_t *wstr, int wlenMax) {
 	if (cstr) {
 		size_t clen = strlen(cstr);
 		int nwords = MultiByteToWideChar(CP_UTF8, 0, (const char *)cstr, (int)clen, NULL, 0);
-		if (nwords >= wlenMax)
-			nwords = wlenMax - 1;
+		nwords = (nwords > wlenMax - 1) ? (wlenMax - 1) : nwords;
 
 		MultiByteToWideChar(CP_UTF8, 0, (const char *)cstr, (int)clen, wstr, (int)nwords);
-		wstr[nwords] = 0;
+		wstr[nwords] = '\0';
 		return wstr;
 	}
 	return NULL;
@@ -466,7 +465,7 @@ _tmain(int argc, TCHAR *argv[]) {
 
 	app.SetupMetaTable();
 	{
-		std::vector<config_item_t>::iterator it = app._config.begin(), itEnd = app._config.end();
+		std::vector<config_item_t>::iterator it = app._config._vCfgItem.begin(), itEnd = app._config._vCfgItem.end();
 		while (it != itEnd) {
 			config_item_t& item = (*it);
 			if (CONVERT_2_SQL == item.c) {

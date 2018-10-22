@@ -16,7 +16,11 @@ enum CONVERT_2_TYPE {
 *
 *
 */
-typedef struct field_meta_s {
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*
+*
+*/
+struct field_meta_t {
 	int id;
 	bool isField;
 	bool isKey;
@@ -24,19 +28,19 @@ typedef struct field_meta_s {
 	bool isToColumn;
 
 	char name[256];
-} field_meta_t;
+};
 
-typedef struct meta_table_s {
-	field_meta_t arr[256];
+struct meta_table_t {
+	struct field_meta_t arr[256];
 
 	bool bTitleOk;
 	int commentRowNum;
 	int fromColumn;
 	int toColumn;
 
-} meta_table_t;
+};
 
-typedef struct config_item_s {
+struct config_item_t {
 	CONVERT_2_TYPE c;
 
 	char inputName[256];
@@ -51,7 +55,16 @@ typedef struct config_item_s {
 	char luaTableName[256];
 
 	meta_table_t metaTable;
-}  config_item_t;
+};
+
+struct config_t {
+	std::string _sUrl;
+	std::string _sUserName;
+	std::string _sPassword;
+	std::string _sDataSource;
+
+	std::vector<config_item_t> _vCfgItem;
+};
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *
@@ -71,7 +84,7 @@ public:
 	static bool StartsWith(const TCHAR *str, const TCHAR *pattern);
 
 public:
-	std::vector<config_item_t> _config;
+	config_t _config;
 };
 
 #endif

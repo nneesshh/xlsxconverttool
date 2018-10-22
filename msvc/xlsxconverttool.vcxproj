@@ -25,7 +25,7 @@
     <ClInclude Include="..\src\XlsxConvertTool.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{D7006BEF-EC83-4D63-8B50-6E87C5A589C5}</ProjectGuid>
+    <ProjectGuid>{5048861F-11D3-490E-B502-50E7A2972F80}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>xls2csv</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
@@ -76,7 +76,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../include;./;../../libxl-3.6.5.0/include_cpp;../../libxl-3.6.2/include_cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;./;../../libxl-3.6.2/include_cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -95,7 +95,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../include;./;../../libxl-3.6.5.0/include_cpp;../../libxl-3.6.2/include_cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;./;../../libxl-3.6.2/include_cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

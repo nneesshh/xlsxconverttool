@@ -103,9 +103,9 @@ CConvert2Lua::Convert(config_item_t *item) {
 
 	// sheet name
 #ifdef _UNICODE
-		CXlsxConvertTool::W2c(sheet->name(), sheetName, 256);
+	CXlsxConvertTool::W2c(sheet->name(), sheetName, 256);
 #else
-		sprintf(sheetName, sheet->name())£»
+	sprintf(sheetName, sheet->name());
 #endif
 
 	// table name
@@ -303,7 +303,7 @@ CConvert2Lua::OutputCell(FILE *fp, void *sheet, int row, int col, field_meta_t& 
 		char buff[1024 * 16] = { 0 };
 		char *str = CXlsxConvertTool::W2c(tstr, buff, sizeof(buff));
 #else
-		const TCHAR *str = sheet_->readStr(cellRow, cellCol);
+		const TCHAR *str = sheet_->readStr(row, col);
 #endif
 		OutputString(fp, str, meta, inputFileName);
 
@@ -335,8 +335,7 @@ CConvert2Lua::OutputString(FILE *fp, const char *str, field_meta_t& meta, const 
 	else {
 		// skip empty string
 //		if (strlen(str) > 0) {
-			fprintf(fp, "%s", fieldSeparator);
-			fprintf(fp, "%s=%c%s%c", meta.name, stringSeparator, str, stringSeparator);
+			fprintf(fp, "%s%s=%c%s%c", fieldSeparator, meta.name, stringSeparator, str, stringSeparator);
 //		}
 	}
 
@@ -359,8 +358,7 @@ CConvert2Lua::OutputNumber(FILE *fp, const double number, field_meta_t& meta, co
 		fprintf(fp, "%s\t[%.15g] = {%s=%.15g", lineSeparator, number, meta.name, number);
 	}
 	else {
-		fprintf(fp, "%s", fieldSeparator);
-		fprintf(fp, "%s=%.15g", meta.name, number);
+		fprintf(fp, "%s%s=%.15g", fieldSeparator, meta.name, number);
 	}
 
 	if (meta.isToColumn) {

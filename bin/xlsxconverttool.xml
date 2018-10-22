@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Root>	
 	<Sql>
-		<!--Item InputName="config_robot.xlsx" SheetIdx="0" TitleRowId="2" Fields="A-D" Keys="A" DeleteClause="1=1" OutputName="config_all.sql" /-->
+		<Item InputName="config_robot.xlsx" SheetIdx="0" TitleRowId="2" Fields="A-D" Keys="A" DeleteClause="1=1" OutputName="config_all.sql" />
 		
 	</Sql>
 	<Lua>
