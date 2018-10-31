@@ -267,21 +267,35 @@ CConvert2Sql::Convert(config_item_t *item) {
 			}
 		}
 
-		// tail
-		fprintf(fp, "%sON DUPLICATE KEY UPDATE ", lineSeparator);
+		// tail -- ON DUPLICATE KEY UPDATE
+		if (sheetFirstCol < sheetLastCol) {
+			int i;
+			bool bFirst = true;
+			std::vector<int> vColDKU; // colums for DUPLICATE KEY UPDATE
 
-		bool bFirst = true;
-		int i;
-		for (i = sheetFirstCol; i < sheetLastCol; ++i) {
-			field_meta_t& tmp = meta_table.arr[i];
+			for (i = sheetFirstCol; i < sheetLastCol; ++i) {
+				field_meta_t& tmp = meta_table.arr[i];
 
-			if (tmp.isField && !tmp.isKey) {
-				if (bFirst) {
-					fprintf(fp, "`%s` = VALUES(`%s`)", tmp.name, tmp.name);
-					bFirst = false;
+				if (tmp.isField && !tmp.isKey) {
+					vColDKU.push_back(i);
 				}
-				else {
-					fprintf(fp, ", `%s` = VALUES(`%s`)", tmp.name, tmp.name);
+			}
+
+			if (vColDKU.size() > 0) {
+
+				fprintf(fp, "%sON DUPLICATE KEY UPDATE ", lineSeparator);
+
+				for (auto& it : vColDKU) {
+					i = it;
+					field_meta_t& tmp = meta_table.arr[i];
+
+					if (bFirst) {
+						fprintf(fp, "`%s` = VALUES(`%s`)", tmp.name, tmp.name);
+						bFirst = false;
+					}
+					else {
+						fprintf(fp, ", `%s` = VALUES(`%s`)", tmp.name, tmp.name);
+					}
 				}
 			}
 		}
